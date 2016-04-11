@@ -1,0 +1,15 @@
+{
+  "name": "btc-consensus",
+  "version": "0.0.0",
+  "description": "Blockchain data aggregated from multiple public sources",
+  "main": "src/blockchain.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5"
+  }
+}
