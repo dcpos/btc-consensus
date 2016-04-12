@@ -1,4 +1,4 @@
-var source = require('../src/blank_source.js');
+var source = require('../src/sources/blank_source.js');
 var assert = require('chai').assert;
 
 describe('BlankSource', function() {
@@ -14,7 +14,8 @@ describe('BlankSource', function() {
                 "is_valid",
                 "total_received_gross",
                 "total_received_net",
-                "total_sent",
+                "total_sent_gross",
+                "total_sent_net",
                 "tx_count",
                 "txs",
                 "utxos",

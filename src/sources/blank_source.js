@@ -1,4 +1,4 @@
-module.exports.Blank = function() {
+exports.Blank = function() {
 
     this.address = function(addr, handler) {
         var blankResult = {
@@ -9,7 +9,8 @@ module.exports.Blank = function() {
             is_valid: true,
             total_received_gross: 0,
             total_received_net: 0,
-            total_sent: 0,
+            total_sent_gross: 0,
+            total_sent_net: 0,
             tx_count: 0,
             txs: [],
             utxos: [],
