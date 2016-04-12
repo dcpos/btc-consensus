@@ -8,15 +8,15 @@ module.exports.Blockchain = function(sources, options) {
         var responses = [];
         // Get address data from each source
         for (var i=0; i<sources.length; i++) {
-            (function() {
-                var source = sources[i];
+            (function(index) {
+                var source = sources[index];
                 source.address(addr, function(err, data) {
                     // Handle error if it exists
                     if (err) {
-                        responses[i] = {}; // result exists but is meaningless
+                        responses[index] = {}; // result exists but is meaningless
                     }
                     else {
-                        responses[i] = data; // cache this result
+                        responses[index] = data; // cache this result
                     }
                     // See if ready to aggregate responses
                     for (var j=0; j<responses.length; j++) {
@@ -29,7 +29,7 @@ module.exports.Blockchain = function(sources, options) {
                     var response = aggregate(responses);
                     handler(null, response);
                 });
-            })();
+            })(i);
         }
     }
 }
