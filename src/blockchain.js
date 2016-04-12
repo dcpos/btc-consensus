@@ -80,3 +80,4 @@ function statisticalMode(values) {
 
 module.exports.Sources = {};
 module.exports.Sources.Blank = require("./sources/blank_source.js").Blank;
+module.exports.Sources.BlockchainDotInfo = require("./sources/blockchain_dot_info.js").BlockchainDotInfo;
