@@ -52,4 +52,11 @@ describe('Source creation', function() {
             }).to.not.throw();
         });
     });
+    describe('insight source', function() {
+        it('can be created', function() {
+            expect(function() {
+                new btc.Sources.Insight();
+            }).to.not.throw();
+        });
+    });
 });
