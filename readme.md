@@ -82,3 +82,42 @@ $ npm run-script minify
 * insight
   * insight.bitpay.com
   * blockexplorer.com
+
+# Response Formats
+
+This is specified formally in `BlankSource` and the assosciated tests.
+
+## address()
+
+```
+{
+    address: "",
+    balance: 0,
+    balance_confirmed: 0,
+    balance_unconfirmed: 0,
+    is_valid: true,
+    total_received_gross: 0,
+    total_received_net: 0,
+    total_sent_gross: 0,
+    total_sent_net: 0,
+    tx_count: 0,
+    txs: [ list of transactions... ],
+    utxos: [ list of unspent transaction outputs... ],
+};
+```
+
+Notes:
+
+`total_received_gross` includes amounts sent from this address to itself (ie
+reusing addresses for change).
+
+`total_received_net` excludes amounts sent from this address to itself. The
+reason is discussed in
+[this issue](https://github.com/bitpay/insight-api/issues/31).
+
+`balance` is the combined balance of `balance_confirmed` and
+`balance_unconfirmed`. `balance_confirmed` is all balances from transactions
+with at least one confirmation. `balance_unconfirmed` is from transactions with
+no confirmations.
+
+Unless specifically stated, unconfirmed transactions are included.
