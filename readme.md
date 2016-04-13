@@ -34,7 +34,7 @@ btc.address("173MjkFkm1iCYTkW7fBZj5EoPHb5JWhyYJ", function(err, data) {
 
 ## Browser
 
-Download the latest version [minified](#) for production or [unminified](#) for development.
+Download the latest version [minified](https://github.com/dcpos/btc-consensus/raw/master/btc-consensus.min.js) for production or [unminified](https://github.com/dcpos/btc-consensus/raw/master/btc-consensus.js) for development.
 
 On your webpage include the tag
 
