@@ -1,3 +1,7 @@
+# Under Development
+
+This is *not ready for production*. It is currently under development.
+
 # About
 
 `btc-consensus` is a javascript library for reading the blockchain. It aggregates multiple public blockchains into what appears to be a single blockchain source. This allows users to trust the received data without running their own blockchain.
@@ -11,12 +15,12 @@ $ npm install --save btc-consensus
 ```
 
 ```
-Blockchain = require('btc-consensus');
+btcConsensus = require('btc-consensus');
 
-btc = new Blockchain([
-    new btc.Sources.Insight(),
-    new btc.Sources.BlockchainDotInfo(),
-    new btc.Sources.Insight("https://blockexplorer.com"),
+btc = new btcConsensus.Blockchain([
+    new btcConsensus.Sources.Insight(),
+    new btcConsensus.Sources.BlockchainDotInfo(),
+    new btcConsensus.Sources.Insight("https://blockexplorer.com"),
     // ... add more if desired
 ]);
 
@@ -56,7 +60,17 @@ btc.address("173MjkFkm1iCYTkW7fBZj5EoPHb5JWhyYJ", function(err, data) {
 # Tests
 
 ```
+$ npm install -g mocha chai
 $ cd path/to/btc-consensus
+$ npm test
+```
+
+# Compile
+
+```
+$ npm install -g browserify uglify-js
 $ npm install --dev
-$ mocha
+$ cd path/to/btc-consensus
+$ npm run-script compile
+$ npm run-script minify
 ```

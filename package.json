@@ -3,13 +3,21 @@
   "version": "0.0.0",
   "description": "Blockchain data aggregated from multiple public sources",
   "main": "src/blockchain.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/dcpos/btc-consensus.git"
+  },
   "scripts": {
+    "compile": "browserify src/blockchain.js --standalone btcConsensus --outfile btc-consensus.js",
+    "minify": "npm run-script compile && uglifyjs btc-consensus.js --compress --mangle --screw-ie8 --output btc-consensus.min.js",
     "test": "mocha"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "chai": "^3.5.0",
-    "mocha": "^2.4.5"
+    "browser-request": "^0.3.3"
+  },
+  "browser": {
+    "request": "browser-request"
   }
 }
