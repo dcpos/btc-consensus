@@ -4,8 +4,16 @@ exports.BlockrDotIo = function() {
 
     this.address = function(addr, handler) {
         var url = "https://btc.blockr.io/api/v1/address/info/" + addr;
-        request(url, function(err, response, body) {
-            var data = JSON.parse(body);
+        request.get({
+            url: url,
+            json: true,
+        }, function(err, response, data) {
+            if (err) {
+                handler(err);
+            }
+            if (response.statusCode != 200) {
+                handle("blockr_dot_io statusCode: " + response.statusCode);
+            }
             var result = {
                 address: addr,
                 balance: data.data.balance * 1e8,

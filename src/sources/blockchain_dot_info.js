@@ -4,8 +4,16 @@ exports.BlockchainDotInfo = function() {
 
     this.address = function(addr, handler) {
         var url = "https://blockchain.info/address/" + addr + "?format=json";
-        request(url, function(err, response, body) {
-            var data = JSON.parse(body);
+        request.get({
+            url: url,
+            json: true,
+        }, function(err, response, data) {
+            if (err) {
+                handler(err);
+            }
+            if (response.statusCode != 200) {
+                handle("blockchain_dot_info statusCode: " + response.statusCode);
+            }
             var result = {
                 address: addr,
                 balance: data.final_balance,

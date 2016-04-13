@@ -12,8 +12,16 @@ exports.Insight = function(root) {
 
     this.address = function(addr, handler) {
         var url = root + "/api/addr/" + addr;
-        request(url, function(err, response, body) {
-            var data = JSON.parse(body);
+        request.get({
+            url: url,
+            json: true,
+        }, function(err, response, data) {
+            if (err) {
+                handler(err);
+            }
+            if (response.statusCode != 200) {
+                handle("insight statusCode: " + response.statusCode);
+            }
             var result = {
                 address: addr,
                 balance: data.balanceSat,
