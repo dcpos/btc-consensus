@@ -12,8 +12,8 @@
     "minify": "npm run-script compile && uglifyjs btc-consensus.js --compress --mangle --screw-ie8 --output btc-consensus.min.js",
     "test": "mocha"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Ian Coleman",
+  "license": "MIT",
   "devDependencies": {
     "browser-request": "^0.3.3"
   },
