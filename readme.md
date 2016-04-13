@@ -74,3 +74,11 @@ $ cd path/to/btc-consensus
 $ npm run-script compile
 $ npm run-script minify
 ```
+
+# Supported Blockchains
+
+* blockchain.info
+* blockr.io
+* insight
+  * insight.bitpay.com
+  * blockexplorer.com

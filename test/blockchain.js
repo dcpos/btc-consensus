@@ -52,6 +52,13 @@ describe('Source creation', function() {
             }).to.not.throw();
         });
     });
+    describe('blockr_dot_io source', function() {
+        it('can be created', function() {
+            expect(function() {
+                new btc.Sources.BlockrDotIo();
+            }).to.not.throw();
+        });
+    });
     describe('insight source', function() {
         it('can be created', function() {
             expect(function() {
