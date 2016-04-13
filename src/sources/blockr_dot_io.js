@@ -12,8 +12,6 @@ exports.BlockrDotIo = function() {
                 is_valid: data.data.is_valid,
                 total_received_net: data.data.totalreceived * 1e8,
                 tx_count: data.data.nb_txs,
-                txs: [], // TODO
-                utxos: [], // TODO
             };
             handler(null, result);
         });

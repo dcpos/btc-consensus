@@ -21,8 +21,6 @@ exports.Insight = function(root) {
                 total_received_gross: data.totalReceivedSat,
                 total_sent_gross: data.totalSentSat,
                 tx_count: data.txApperances,
-                txs: [], // TODO
-                utxos: [], // TODO
             };
             handler(null, result);
         });

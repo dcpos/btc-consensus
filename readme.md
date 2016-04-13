@@ -101,8 +101,6 @@ This is specified formally in `BlankSource` and the assosciated tests.
     total_sent_gross: 0,
     total_sent_net: 0,
     tx_count: 0,
-    txs: [ list of transactions... ],
-    utxos: [ list of unspent transaction outputs... ],
 };
 ```
 

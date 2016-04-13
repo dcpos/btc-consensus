@@ -12,8 +12,6 @@ exports.Blank = function() {
             total_sent_gross: 0,
             total_sent_net: 0,
             tx_count: 0,
-            txs: [],
-            utxos: [],
         };
         handler(null, blankResult);
     }

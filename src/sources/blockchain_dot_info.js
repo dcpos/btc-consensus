@@ -12,8 +12,6 @@ exports.BlockchainDotInfo = function() {
                 total_received_net: data.total_received,
                 total_sent_net: data.total_sent,
                 tx_count: data.n_tx,
-                txs: [], // TODO
-                utxos: [], // TODO
             };
             handler(null, result);
         });

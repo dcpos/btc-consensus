@@ -17,8 +17,6 @@ describe('BlankSource', function() {
                 "total_sent_gross",
                 "total_sent_net",
                 "tx_count",
-                "txs",
-                "utxos",
             ];
             s.address(testAddr, function(err, data) {
                 // has all desired keys
