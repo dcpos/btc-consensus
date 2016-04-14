@@ -31,7 +31,7 @@ describe('BlockchainDotInfo', function() {
                 // No error
                 assert.equal(err, null);
                 // Contains data
-                assert.isAtLeast(data.length, 1);
+                assert.isAtLeast(data.length, 165);
                 // Uses satoshis
                 assert.isAtLeast(data[0].amount, 1000);
                 // Oldest first
