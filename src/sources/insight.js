@@ -11,7 +11,7 @@ exports.Insight = function(root) {
     root = root.replace(/\/+$/g, "");
 
     this.address = function(addr, handler) {
-        var url = root + "/api/addr/" + addr;
+        var url = root + "/api/addr/" + addr + "?noTxList=1&noCache=1";
         request.get({
             url: url,
             json: true,
