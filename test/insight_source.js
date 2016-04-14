@@ -23,6 +23,24 @@ describe('Insight', function() {
                 });
             });
         });
+        describe('utxos()', function() {
+            it('returns data for the address', function(done) {
+                var s = new source.Insight();
+                // Not great to have to use the internet to test...
+                var testAddr = "1BitcoinEaterAddressDontSendf59kuE";
+                s.utxos(testAddr, function(err, data) {
+                    // No error
+                    assert.equal(err, null);
+                    // Contains data
+                    assert.isAtLeast(data.length, 201);
+                    // Uses satoshis
+                    assert.isAtLeast(data[0].amount, 1000);
+                    // Oldest first
+                    assert.isAbove(data[0].confirmations, data[data.length-1].confirmations);
+                    done();
+                });
+            });
+        });
     });
     context('with custom root', function() {
         it('returns data', function(done) {
