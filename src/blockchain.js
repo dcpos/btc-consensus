@@ -34,7 +34,21 @@ module.exports.Blockchain = function(sources, options) {
     }
 }
 
+// Collapse multiple responses into a single response.
 function aggregate(responses) {
+    var firstResponse = responses[0];
+    if (isArray(firstResponse)) {
+        return aggregateArrays(responses);
+    }
+    else {
+        return aggregateObjects(responses);
+    }
+}
+module.exports.aggregate = aggregate; // ugly, but exporting aids testing
+
+// Aggregates a number of objects into a single object with the most common
+// value for each key.
+function aggregateObjects(responses) {
     // Group all values for different keys together
     var collated = {};
     for (var i=0; i<responses.length; i++) {
@@ -57,8 +71,39 @@ function aggregate(responses) {
     return modes;
 }
 
+// Aggregates a number of array into a single array with the most common
+// value for each index. Assumes sorting is consistent for all arrays.
+function aggregateArrays(responses) {
+    // Group all values for each index together.
+    // Assumes that each response is sorted in the same order.
+    var collated = {};
+    for (var i=0; i<responses.length; i++) {
+        var response = responses[i];
+        for (var j=0; j<response.length; j++) {
+            if (!(j in collated)) {
+                collated[j] = [];
+            }
+            var value = response[j];
+            collated[j].push(value);
+        }
+    }
+    // For each index's group of values, use the mode
+    var modes = [];
+    for (var key in collated) {
+        var values = collated[key];
+        var value = statisticalMode(values);
+        modes[key] = value;
+    }
+    return modes;
+}
+
+function isArray(val) {
+    return Object.prototype.toString.call(val) === '[object Array]';
+}
+
 function statisticalMode(values) {
-    // TODO handle multimodal values
+    // multimodal values are handled by using the first instance
+    // eg [1,2] returns 1 as the mode
     var valCounts = {};
     var commonestVal = null;
     var commonestValCount = 0;
