@@ -22,4 +22,22 @@ describe('BlockchainDotInfo', function() {
             });
         });
     });
+    describe('utxo()', function() {
+        it('returns data for the address', function(done) {
+            var s = new source.BlockchainDotInfo();
+            // Not great to have to use the internet to test...
+            var testAddr = "1BitcoinEaterAddressDontSendf59kuE";
+            s.utxos(testAddr, function(err, data) {
+                // No error
+                assert.equal(err, null);
+                // Contains data
+                assert.isAtLeast(data.length, 1);
+                // Uses satoshis
+                assert.isAtLeast(data[0].amount, 1000);
+                // Oldest first
+                assert.isAbove(data[0].confirmations, data[data.length-1].confirmations);
+                done();
+            });
+        });
+    });
 });
