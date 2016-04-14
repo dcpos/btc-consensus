@@ -16,4 +16,22 @@ exports.Blank = function() {
         handler(null, blankResult);
     }
 
+    this.utxos = function(addr, handler) {
+        var blankResult = [
+            {
+                tx_id: "",
+                tx_output: 0,
+                amount: 0,
+                confirmations: 2,
+            },
+            {
+                tx_id: "",
+                tx_output: 0,
+                amount: 0,
+                confirmations: 1,
+            }
+        ];
+        handler(null, blankResult);
+    }
+
 }
