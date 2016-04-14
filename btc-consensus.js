@@ -510,7 +510,7 @@ module.exports.Blockchain = function(sources, options) {
                 source.address(addr, function(err, data) {
                     // Handle error if it exists
                     if (err) {
-                        responses[index] = {}; // result exists but is meaningless
+                        responses[index] = {}; // result is in but is meaningless
                     }
                     else {
                         responses[index] = data; // cache this result
@@ -529,9 +529,53 @@ module.exports.Blockchain = function(sources, options) {
             })(i);
         }
     }
+
+    this.utxos = function(addr, handler) {
+        var responses = [];
+        // Get utxo data from each source
+        for (var i=0; i<sources.length; i++) {
+            (function(index) {
+                var source = sources[index];
+                source.utxos(addr, function(err, data) {
+                    // Handle error if it exists
+                    if (err) {
+                        responses[index] = {}; // result is in but is meaningless
+                    }
+                    else {
+                        responses[index] = data; // cache this result
+                    }
+                    // See if ready to aggregate responses
+                    for (var j=0; j<responses.length; j++) {
+                        if (typeof responses[j] == "undefined") {
+                            // Not ready to aggregate
+                            return;
+                        }
+                    }
+                    // Aggregate the responses
+                    var response = aggregate(responses);
+                    handler(null, response);
+                });
+            })(i);
+        }
+    }
+
 }
 
+// Collapse multiple responses into a single response.
 function aggregate(responses) {
+    var firstResponse = responses[0];
+    if (isArray(firstResponse)) {
+        return aggregateArrays(responses);
+    }
+    else {
+        return aggregateObjects(responses);
+    }
+}
+module.exports.aggregate = aggregate; // ugly, but exporting aids testing
+
+// Aggregates a number of objects into a single object with the most common
+// value for each key.
+function aggregateObjects(responses) {
     // Group all values for different keys together
     var collated = {};
     for (var i=0; i<responses.length; i++) {
@@ -554,8 +598,39 @@ function aggregate(responses) {
     return modes;
 }
 
+// Aggregates a number of array into a single array with the most common
+// value for each index. Assumes sorting is consistent for all arrays.
+function aggregateArrays(responses) {
+    // Group all values for each index together.
+    // Assumes that each response is sorted in the same order.
+    var collated = {};
+    for (var i=0; i<responses.length; i++) {
+        var response = responses[i];
+        for (var j=0; j<response.length; j++) {
+            if (!(j in collated)) {
+                collated[j] = [];
+            }
+            var value = response[j];
+            collated[j].push(value);
+        }
+    }
+    // For each index's group of values, use the mode
+    var modes = [];
+    for (var key in collated) {
+        var values = collated[key];
+        var value = statisticalMode(values);
+        modes[key] = value;
+    }
+    return modes;
+}
+
+function isArray(val) {
+    return Object.prototype.toString.call(val) === '[object Array]';
+}
+
 function statisticalMode(values) {
-    // TODO handle multimodal values
+    // multimodal values are handled by using the first instance
+    // eg [1,2] returns 1 as the mode
     var valCounts = {};
     var commonestVal = null;
     var commonestValCount = 0;
@@ -578,9 +653,10 @@ function statisticalMode(values) {
 module.exports.Sources = {};
 module.exports.Sources.Blank = require("./sources/blank_source.js").Blank;
 module.exports.Sources.BlockchainDotInfo = require("./sources/blockchain_dot_info.js").BlockchainDotInfo;
+module.exports.Sources.BlockrDotIo = require("./sources/blockr_dot_io.js").BlockrDotIo;
 module.exports.Sources.Insight = require("./sources/insight.js").Insight;
 
-},{"./sources/blank_source.js":3,"./sources/blockchain_dot_info.js":4,"./sources/insight.js":5}],3:[function(require,module,exports){
+},{"./sources/blank_source.js":3,"./sources/blockchain_dot_info.js":4,"./sources/blockr_dot_io.js":5,"./sources/insight.js":6}],3:[function(require,module,exports){
 exports.Blank = function() {
 
     this.address = function(addr, handler) {
@@ -595,9 +671,25 @@ exports.Blank = function() {
             total_sent_gross: 0,
             total_sent_net: 0,
             tx_count: 0,
-            txs: [],
-            utxos: [],
         };
+        handler(null, blankResult);
+    }
+
+    this.utxos = function(addr, handler) {
+        var blankResult = [
+            {
+                tx_id: "",
+                tx_output: 0,
+                amount: 0,
+                confirmations: 2,
+            },
+            {
+                tx_id: "",
+                tx_output: 0,
+                amount: 0,
+                confirmations: 1,
+            }
+        ];
         handler(null, blankResult);
     }
 
@@ -610,24 +702,134 @@ exports.BlockchainDotInfo = function() {
 
     this.address = function(addr, handler) {
         var url = "https://blockchain.info/address/" + addr + "?format=json";
-        request(url, function(err, response, body) {
-            var data = JSON.parse(body);
+        request.get({
+            url: url,
+            json: true,
+        }, function(err, response, data) {
+            if (err) {
+                handler(err);
+            }
+            if (response.statusCode != 200) {
+                handle("blockchain_dot_info statusCode: " + response.statusCode);
+            }
             var result = {
                 address: addr,
                 balance: data.final_balance,
                 total_received_net: data.total_received,
                 total_sent_net: data.total_sent,
                 tx_count: data.n_tx,
-                txs: [], // TODO
-                utxos: [], // TODO
             };
             handler(null, result);
+        });
+    }
+
+    this.utxos = function(addr, handler) {
+        var url = "https://blockchain.info/unspent?active=" + addr;
+        request.get({
+            url: url,
+            json: true,
+        }, function(err, response, data) {
+            if (err) {
+                handler(err);
+            }
+            if (response.statusCode != 200) {
+                handle("blockchain_dot_info statusCode: " + response.statusCode);
+            }
+            if ("notice" in data) {
+                // eg "This wallet contains a very large number of small unspent inputs. Ignoring some."
+                // for 1BitcoinEaterAddressDontSendf59kuE
+                // TODO handle this situation
+            }
+            var utxos = [];
+            for (var i=0; i<data.unspent_outputs.length; i++) {
+                var dataUtxo = data.unspent_outputs[i];
+                var utxo = {
+                    tx_id: dataUtxo.tx_hash,
+                    tx_output: dataUtxo.tx_output_n,
+                    amount: dataUtxo.value,
+                    confirmations: dataUtxo.confirmations,
+                };
+                utxos.push(utxo);
+            }
+            // Sort oldest utxo first
+            // TODO consider multiple utxos with same confirmations, and how it
+            // affects sorting and thus correlation when aggregating.
+            utxos.sort(function(a,b) {
+                return a.confirmations < b.confirmations;
+            });
+            handler(null, utxos);
         });
     }
 
 }
 
 },{"request":1}],5:[function(require,module,exports){
+var request = require('request');
+
+exports.BlockrDotIo = function() {
+
+    this.address = function(addr, handler) {
+        var url = "https://btc.blockr.io/api/v1/address/info/" + addr;
+        request.get({
+            url: url,
+            json: true,
+        }, function(err, response, data) {
+            if (err) {
+                handler(err);
+            }
+            if (response.statusCode != 200) {
+                handle("blockr_dot_io statusCode: " + response.statusCode);
+            }
+            var result = {
+                address: addr,
+                balance: data.data.balance * 1e8,
+                is_valid: data.data.is_valid,
+                total_received_net: data.data.totalreceived * 1e8,
+                tx_count: data.data.nb_txs,
+            };
+            handler(null, result);
+        });
+    }
+
+    this.utxos = function(addr, handler) {
+        var url = "https://btc.blockr.io/api/v1/address/unspent/" + addr;
+        request.get({
+            url: url,
+            json: true,
+        }, function(err, response, data) {
+            if (err) {
+                handler(err);
+            }
+            if (response.statusCode != 200) {
+                handle("blockr_dot_io statusCode: " + response.statusCode);
+            }
+            if (data.status != "success") {
+                handle("blockr_dot_io status: " + data.status);
+            }
+            var utxos = [];
+            for (var i=0; i<data.data.unspent.length; i++) {
+                var dataUtxo = data.data.unspent[i];
+                var utxo = {
+                    tx_id: dataUtxo.tx,
+                    tx_output: dataUtxo.n,
+                    amount: parseFloat(dataUtxo.amount) * 1e8,
+                    confirmations: dataUtxo.confirmations,
+                };
+                utxos.push(utxo);
+            }
+            // Sort oldest utxo first
+            // TODO consider multiple utxos with same confirmations, and how it
+            // affects sorting and thus correlation when aggregating.
+            utxos.sort(function(a,b) {
+                return a.confirmations < b.confirmations;
+            });
+            handler(null, utxos);
+        });
+    }
+
+}
+
+},{"request":1}],6:[function(require,module,exports){
 var request = require('request');
 
 exports.Insight = function(root) {
@@ -641,9 +843,17 @@ exports.Insight = function(root) {
     root = root.replace(/\/+$/g, "");
 
     this.address = function(addr, handler) {
-        var url = root + "/api/addr/" + addr;
-        request(url, function(err, response, body) {
-            var data = JSON.parse(body);
+        var url = root + "/api/addr/" + addr + "?noTxList=1&noCache=1";
+        request.get({
+            url: url,
+            json: true,
+        }, function(err, response, data) {
+            if (err) {
+                handler(err);
+            }
+            if (response.statusCode != 200) {
+                handle("insight statusCode: " + response.statusCode);
+            }
             var result = {
                 address: addr,
                 balance: data.balanceSat,
@@ -651,10 +861,41 @@ exports.Insight = function(root) {
                 total_received_gross: data.totalReceivedSat,
                 total_sent_gross: data.totalSentSat,
                 tx_count: data.txApperances,
-                txs: [], // TODO
-                utxos: [], // TODO
             };
             handler(null, result);
+        });
+    }
+
+    this.utxos = function(addr, handler) {
+        var url = "https://insight.bitpay.com/api/addr/" + addr + "/utxo?noCache=1";
+        request.get({
+            url: url,
+            json: true,
+        }, function(err, response, data) {
+            if (err) {
+                handler(err);
+            }
+            if (response.statusCode != 200) {
+                handle("insight statusCode: " + response.statusCode);
+            }
+            var utxos = [];
+            for (var i=0; i<data.length; i++) {
+                var dataUtxo = data[i];
+                var utxo = {
+                    tx_id: dataUtxo.txid,
+                    tx_output: dataUtxo.vout,
+                    amount: dataUtxo.amount * 1e8,
+                    confirmations: dataUtxo.confirmations,
+                };
+                utxos.push(utxo);
+            }
+            // Sort oldest utxo first
+            // TODO consider multiple utxos with same confirmations, and how it
+            // affects sorting and thus correlation when aggregating.
+            utxos.sort(function(a,b) {
+                return a.confirmations < b.confirmations;
+            });
+            handler(null, utxos);
         });
     }
 
