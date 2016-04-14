@@ -87,6 +87,8 @@ $ npm run-script minify
 
 This is specified formally in `BlankSource` and the assosciated tests.
 
+All money amounts are in satoshis and are integer values.
+
 ## address()
 
 ```
@@ -119,3 +121,21 @@ with at least one confirmation. `balance_unconfirmed` is from transactions with
 no confirmations.
 
 Unless specifically stated, unconfirmed transactions are included.
+
+## utxos()
+
+```
+[
+    {
+        tx_id: "",
+        tx_output: 0,
+        amount: 0,
+        confirmations: 0,
+    }
+]
+```
+
+Notes:
+
+Ordered by oldest utxo first, where oldest is determined by highest
+confirmations.
