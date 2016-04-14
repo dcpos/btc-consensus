@@ -13,7 +13,7 @@ module.exports.Blockchain = function(sources, options) {
                 source.address(addr, function(err, data) {
                     // Handle error if it exists
                     if (err) {
-                        responses[index] = {}; // result exists but is meaningless
+                        responses[index] = {}; // result is in but is meaningless
                     }
                     else {
                         responses[index] = data; // cache this result
@@ -32,6 +32,36 @@ module.exports.Blockchain = function(sources, options) {
             })(i);
         }
     }
+
+    this.utxos = function(addr, handler) {
+        var responses = [];
+        // Get utxo data from each source
+        for (var i=0; i<sources.length; i++) {
+            (function(index) {
+                var source = sources[index];
+                source.utxos(addr, function(err, data) {
+                    // Handle error if it exists
+                    if (err) {
+                        responses[index] = {}; // result is in but is meaningless
+                    }
+                    else {
+                        responses[index] = data; // cache this result
+                    }
+                    // See if ready to aggregate responses
+                    for (var j=0; j<responses.length; j++) {
+                        if (typeof responses[j] == "undefined") {
+                            // Not ready to aggregate
+                            return;
+                        }
+                    }
+                    // Aggregate the responses
+                    var response = aggregate(responses);
+                    handler(null, response);
+                });
+            })(i);
+        }
+    }
+
 }
 
 // Collapse multiple responses into a single response.

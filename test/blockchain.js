@@ -35,6 +35,24 @@ describe('Blockchain', function() {
             });
         });
     });
+
+    describe('utxos', function() {
+        b = new btc.Blockchain([
+            new btc.Sources.Blank(),
+            new btc.Sources.Blank(),
+        ]);
+        it("returns a aggregated result", function() {
+            var addr = "any address";
+            b.utxos(addr, function(err, data) {
+                assert.equal(err, null);
+                assert.isAtLeast(data.length, 2);
+                assert.equal(data[0].tx_id, "");
+                assert.equal(data[0].amount, 0);
+                assert.equal(data[0].confirmations, 2);
+                assert.equal(data[1].confirmations, 1);
+            });
+        });
+    });
 });
 
 describe('Source creation', function() {
