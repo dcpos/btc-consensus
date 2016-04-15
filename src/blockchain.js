@@ -101,30 +101,40 @@ function aggregateObjects(responses) {
     return modes;
 }
 
-// Aggregates a number of array into a single array with the most common
-// value for each index. Assumes sorting is consistent for all arrays.
+// Deduplicates array items whilst retaining the correct order
 function aggregateArrays(responses) {
-    // Group all values for each index together.
-    // Assumes that each response is sorted in the same order.
-    var collated = {};
-    for (var i=0; i<responses.length; i++) {
-        var response = responses[i];
-        for (var j=0; j<response.length; j++) {
-            if (!(j in collated)) {
-                collated[j] = [];
+    var values = [];
+    // Attempt to retain correct ordering by starting with longest response
+    responses.sort(function(a, b) {
+        return a.length < b.length; // longest first
+    });
+    // Track entries to avoid duplicates
+    var deduped = {};
+    var longestResponse = responses[0];
+    for (var i=0; i<longestResponse.length; i++) {
+        // Store this value
+        var value = longestResponse[i];
+        if (!(value in deduped)) {
+            values.push(value);
+            deduped[value] = true;
+        }
+        // Work out how far through processing we've gone
+        var progress = i / (longestResponse.length-1);
+        // Store the equivalent value from every other response. This is
+        // calculated by going 'equally far along' the array compared to our
+        // progress along the longest response.
+        for (var j=1; j<responses.length; j++) {
+            var otherResponse = responses[j];
+            var otherResponseProgress = progress * (otherResponse.length-1);
+            var otherResponseIndex = Math.round(otherResponseProgress);
+            var value = otherResponse[otherResponseIndex];
+            if (!(value in deduped)) {
+                values.push(value);
+                deduped[value] = true;
             }
-            var value = response[j];
-            collated[j].push(value);
         }
     }
-    // For each index's group of values, use the mode
-    var modes = [];
-    for (var key in collated) {
-        var values = collated[key];
-        var value = statisticalMode(values);
-        modes[key] = value;
-    }
-    return modes;
+    return values;
 }
 
 function isArray(val) {
