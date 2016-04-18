@@ -117,6 +117,16 @@ describe("aggregate", function() {
                 assert.equal(a[i], i);
             }
         });
+        it('retains the order for very different lengthed arrays', function() {
+            var arrays = [
+                [0,9],
+                [0,1,2,3,4,5,6,7,8,9],
+            ];
+            var a = aggregate(arrays);
+            for (var i=0; i<=9; i++) {
+                assert.equal(a[i], i);
+            }
+        });
         it('does not understand original ordering conditions', function(done) {
             // ordering of each response is lowest to highest, but the result
             // will not be lowest to highest (in this particular case it will

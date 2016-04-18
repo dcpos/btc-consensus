@@ -126,7 +126,7 @@ function aggregateArrays(responses) {
         for (var j=1; j<responses.length; j++) {
             var otherResponse = responses[j];
             var otherResponseProgress = progress * (otherResponse.length-1);
-            var otherResponseIndex = Math.round(otherResponseProgress);
+            var otherResponseIndex = Math.floor(otherResponseProgress);
             var value = otherResponse[otherResponseIndex];
             if (!(value in deduped)) {
                 values.push(value);
