@@ -16,7 +16,7 @@ exports.BlockrDotIo = function() {
             }
             var result = {
                 address: addr,
-                balance: data.data.balance * 1e8,
+                balance_confirmed: data.data.balance * 1e8,
                 is_valid: data.data.is_valid,
                 total_received_net: data.data.totalreceived * 1e8,
                 tx_count: data.data.nb_txs,

@@ -24,7 +24,8 @@ exports.Insight = function(root) {
             }
             var result = {
                 address: addr,
-                balance: data.balanceSat,
+                balance: data.balanceSat + data.unconfirmedBalanceSat,
+                balance_confirmed: data.balanceSat,
                 balance_unconfirmed: data.unconfirmedBalanceSat,
                 total_received_gross: data.totalReceivedSat,
                 total_sent_gross: data.totalSentSat,

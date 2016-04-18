@@ -14,6 +14,8 @@ exports.BlockchainDotInfo = function() {
             if (response.statusCode != 200) {
                 handle("blockchain_dot_info statusCode: " + response.statusCode);
             }
+            // TODO use data.txs to calculate
+            // balance_confirmed and balance_unconfirmed
             var result = {
                 address: addr,
                 balance: data.final_balance,
