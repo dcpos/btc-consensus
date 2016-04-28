@@ -26,7 +26,7 @@ describe('Blockchain', function() {
             new btc.Sources.Blank(),
             new btc.Sources.Blank(),
         ]);
-        it("returns a aggregated result", function() {
+        it("returns an aggregated result", function() {
             var addr = "any address";
             b.address(addr, function(err, data) {
                 assert.equal(err, null);
@@ -41,7 +41,7 @@ describe('Blockchain', function() {
             new btc.Sources.Blank(),
             new btc.Sources.Blank(),
         ]);
-        it("returns a aggregated result", function() {
+        it("returns an aggregated result", function() {
             var addr = "any address";
             b.utxos(addr, function(err, data) {
                 assert.equal(err, null);
@@ -53,6 +53,23 @@ describe('Blockchain', function() {
             });
         });
     });
+
+    describe('txs', function() {
+        b = new btc.Blockchain([
+            new btc.Sources.Blank(),
+            new btc.Sources.Blank(),
+        ]);
+        it("returns an aggregated result", function() {
+            var addr = "any address";
+            b.txs(addr, function(err, data) {
+                assert.equal(err, null);
+                assert.isAtLeast(data.length, 2);
+                assert.equal(data[0], "oldest_tx_hash");
+                assert.equal(data[1], "newest_tx_hash");
+            });
+        });
+    });
+
 });
 
 describe('Source creation', function() {
