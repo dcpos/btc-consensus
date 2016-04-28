@@ -19,5 +19,8 @@
   },
   "browser": {
     "request": "browser-request"
+  },
+  "dependencies": {
+    "request": "^2.72.0"
   }
 }
