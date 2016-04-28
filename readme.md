@@ -139,3 +139,18 @@ Notes:
 
 Ordered by oldest utxo first, where oldest is determined by highest
 confirmations.
+
+## txs()
+
+```
+[
+    "oldest_tx_id",
+    ...
+    "newest_tx_id"
+]
+```
+
+Notes:
+
+Ordered by oldest tx first, where oldest is determined by highest
+confirmations.

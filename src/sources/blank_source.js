@@ -34,4 +34,12 @@ exports.Blank = function() {
         handler(null, blankResult);
     }
 
+    this.txs = function(addr, handler) {
+        var blankResult = [
+            "oldest_tx_hash",
+            "newest_tx_hash",
+        ];
+        handler(null, blankResult);
+    }
+
 }

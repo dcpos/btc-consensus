@@ -63,4 +63,18 @@ describe('BlankSource', function() {
             });
         });
     });
+    describe('txs()', function() {
+        it('returns an object', function(done) {
+            var s = new source.Blank();
+            var testAddr = "any bitcoin address";
+            s.txs(testAddr, function(err, data) {
+                // is a list of tx hashes
+                assert.isAtLeast(data.length, 1);
+                // oldest tx first (more confirmations means older tx)
+                assert.equal(data[0], "oldest_tx_hash");
+                assert.equal(data[1], "newest_tx_hash");
+                done();
+            });
+        });
+    });
 });
