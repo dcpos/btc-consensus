@@ -68,4 +68,22 @@ exports.Insight = function(root) {
         });
     }
 
+    this.txs = function(addr, handler) {
+        var url = root + "/api/txs/?address=" + addr;
+        request.get({
+            url: url,
+            json: true,
+        }, function(err, response, data) {
+            if (err) {
+                handler(err);
+            }
+            if (response.statusCode != 200) {
+                handle("insight statusCode: " + response.statusCode);
+            }
+            var txHashes = data.txs.map(function(t) { return t.txid; });
+            var oldestFirst = txHashes.reverse();
+            handler(null, oldestFirst);
+        });
+    }
+
 }
