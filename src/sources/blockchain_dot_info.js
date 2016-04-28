@@ -2,6 +2,8 @@ var request = require('request');
 
 exports.BlockchainDotInfo = function() {
 
+    var self = this;
+
     this.address = function(addr, handler) {
         var url = "https://blockchain.info/address/" + addr + "?format=json";
         request.get({
@@ -62,6 +64,46 @@ exports.BlockchainDotInfo = function() {
                 return a.confirmations < b.confirmations;
             });
             handler(null, utxos);
+        });
+    }
+
+    this.txs = function(addr, handler, offset, result) {
+        var maxTxCount = 1e5; // circuit-breaker
+        var txPerPage = 50;
+        var url = "https://blockchain.info/address/" + addr + "?format=json";
+        if (offset) {
+            url = url + "&offset=" + offset;
+        }
+        else {
+            offset = 0;
+        }
+        if (!result) {
+            result = [];
+        }
+        request.get({
+            url: url,
+            json: true,
+        }, function(err, response, data) {
+            if (err) {
+                handler(err);
+            }
+            if (response.statusCode != 200) {
+                handle("blockchain_dot_info statusCode: " + response.statusCode);
+            }
+            // Save these tx hashes to the result
+            var txHashes = data.txs.map(function(t) { return t.hash; });
+            var oldestFirst = txHashes.reverse();
+            result = oldestFirst.concat(result);
+            // Get more if required due to pagination
+            var hasAllTxs = result.length >= data.n_tx;
+            var belowMaxTxs = offset < maxTxCount;
+            if (!hasAllTxs && belowMaxTxs) {
+                var nextOffset = offset + txPerPage;
+                self.txs(addr, handler, nextOffset, result);
+            }
+            else {
+                handler(null, result);
+            }
         });
     }
 

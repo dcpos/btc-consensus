@@ -40,4 +40,21 @@ describe('BlockchainDotInfo', function() {
             });
         });
     });
+    describe('txs()', function () {
+        it('returns data for the address', function(done) {
+            this.timeout(30000);
+            var s = new source.BlockchainDotInfo();
+            // Not great to have to use the internet to test...
+            var testAddr = "1BitcoinEaterAddressDontSendf59kuE";
+            s.txs(testAddr, function(err, data) {
+                // No error
+                assert.equal(err, null);
+                // Contains data
+                assert.isAtLeast(data.length, 202);
+                // Oldest is first
+                assert.equal(data[0], "369d241af595fc253479abe394e2f21fda05820a0416942f63266dd793035cf1");
+                done();
+            });
+        });
+    });
 });
