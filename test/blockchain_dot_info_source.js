@@ -42,7 +42,6 @@ describe('BlockchainDotInfo', function() {
     });
     describe('txs()', function () {
         it('returns data for the address', function(done) {
-            this.timeout(30000);
             var s = new source.BlockchainDotInfo();
             // Not great to have to use the internet to test...
             var testAddr = "1BitcoinEaterAddressDontSendf59kuE";

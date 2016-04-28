@@ -22,7 +22,6 @@ describe('BlockrDotIo', function() {
     });
     describe('utxos()', function() {
         it('returns data for the address', function(done) {
-            this.timeout(3000); // blockr.io takes 2.29s to serve this
             var s = new source.BlockrDotIo();
             // Not great to have to use the internet to test...
             var testAddr = "1BitcoinEaterAddressDontSendf59kuE";
@@ -41,7 +40,6 @@ describe('BlockrDotIo', function() {
     });
     describe('txs()', function () {
         it('returns data for the address', function(done) {
-            this.timeout(30000);
             var s = new source.BlockrDotIo();
             // Not great to have to use the internet to test...
             var testAddr = "1BitcoinEaterAddressDontSendf59kuE";
