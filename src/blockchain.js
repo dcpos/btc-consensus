@@ -114,12 +114,16 @@ function aggregateArrays(responses) {
     for (var i=0; i<longestResponse.length; i++) {
         // Store this value
         var value = longestResponse[i];
-        if (!(value in deduped)) {
+        var dedupeKey = JSON.stringify(value);
+        if (!(dedupeKey in deduped)) {
             values.push(value);
-            deduped[value] = true;
+            deduped[dedupeKey] = true;
         }
         // Work out how far through processing we've gone
-        var progress = i / (longestResponse.length-1);
+        var progress = 1;
+        if (longestResponse.length != 1) {
+            progress = i / (longestResponse.length-1);
+        }
         // Store the equivalent value from every other response. This is
         // calculated by going 'equally far along' the array compared to our
         // progress along the longest response.
@@ -128,9 +132,10 @@ function aggregateArrays(responses) {
             var otherResponseProgress = progress * (otherResponse.length-1);
             var otherResponseIndex = Math.floor(otherResponseProgress);
             var value = otherResponse[otherResponseIndex];
-            if (!(value in deduped)) {
+            var dedupeKey = JSON.stringify(value);
+            if (!(dedupeKey in deduped)) {
                 values.push(value);
-                deduped[value] = true;
+                deduped[dedupeKey] = true;
             }
         }
     }

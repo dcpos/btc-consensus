@@ -100,12 +100,16 @@ describe("aggregate", function() {
         });
         it('combines arrays of objects', function() {
             var arrays = [
-                [{x:2}],
-                [{x:1}],
-                [{x:1}],
+                [{x:2,y:1}],
+                [{x:1,y:1}],
+                [{x:1,y:1}],
             ];
             var a = aggregate(arrays);
+            assert.equal(a.length, 2);
             assert.equal(a[0].x, 2);
+            assert.equal(a[0].y, 1);
+            assert.equal(a[1].x, 1);
+            assert.equal(a[1].y, 1);
         });
         it('retains the order for different lengthed arrays', function() {
             var arrays = [
