@@ -61,4 +61,22 @@ exports.BlockrDotIo = function() {
         });
     }
 
+    this.txs = function(addr, handler) {
+        var url = "https://btc.blockr.io/api/v1/address/txs/" + addr;
+        request.get({
+            url: url,
+            json: true,
+        }, function(err, response, data) {
+            if (err) {
+                handler(err);
+            }
+            if (response.statusCode != 200) {
+                handle("blockr_dot_io statusCode: " + response.statusCode);
+            }
+            var txHashes = data.data.txs.map(function(t) { return t.tx; });
+            var oldestFirst = txHashes.reverse();
+            handler(null, oldestFirst);
+        });
+    }
+
 }
