@@ -154,3 +154,34 @@ Notes:
 
 Ordered by oldest tx first, where oldest is determined by highest
 confirmations.
+
+## tx()
+
+```
+{
+    block_height: 0,
+    block_time: 0,
+    lock_time: 0,
+    tx_id: "",
+    fee: 0,
+    inputs: [
+        {
+            address: "",
+            txid: "",
+            amount: 0,
+            tx_output: 0,
+        },
+    ],
+    outputs: [
+        {
+            address: "",
+            amount: 0,
+        }
+    ],
+}
+```
+
+Notes:
+
+`block_time` is the timestamp included by the block and is subject to variation
+of the [Block Timestamp](https://en.bitcoin.it/wiki/Block_timestamp)

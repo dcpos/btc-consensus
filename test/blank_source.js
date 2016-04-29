@@ -77,4 +77,31 @@ describe('BlankSource', function() {
             });
         });
     });
+    describe('tx()', function () {
+        it('returns an object', function(done) {
+            var s = new source.Blank();
+            var testTxid = "any tx id";
+            var keys = [
+                "block_height",
+                "block_time",
+                "lock_time",
+                "tx_id",
+                "fee",
+                "inputs",
+                "outputs",
+            ];
+            s.tx(testTxid, function(err, data) {
+                // has all desired keys
+                for (var i=0; i<keys.length; i++) {
+                    var key = keys[i];
+                    assert.equal(key in data, true, "missing key " + key);
+                }
+                // no additional keys
+                for (var key in data) {
+                    assert.isAbove(keys.indexOf(key), -1, "additional key " + key);
+                }
+                done();
+            });
+        });
+    });
 });

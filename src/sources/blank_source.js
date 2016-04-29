@@ -42,4 +42,29 @@ exports.Blank = function() {
         handler(null, blankResult);
     }
 
+    this.tx = function(txid, handler) {
+        var blankResult = {
+            block_height: 0,
+            block_time: 0,
+            lock_time: 0,
+            tx_id: "",
+            fee: 0,
+            inputs: [
+                {
+                    address: "",
+                    txid: "",
+                    amount: 0,
+                    tx_output: 0,
+                },
+            ],
+            outputs: [
+                {
+                    address: "",
+                    amount: 0,
+                }
+            ],
+        };
+        handler(null, blankResult);
+    }
+
 }
