@@ -50,7 +50,7 @@ exports.BlockchainDotInfo = function() {
             for (var i=0; i<data.unspent_outputs.length; i++) {
                 var dataUtxo = data.unspent_outputs[i];
                 var utxo = {
-                    tx_id: dataUtxo.tx_hash,
+                    txid: dataUtxo.tx_hash,
                     tx_output: dataUtxo.tx_output_n,
                     amount: dataUtxo.value,
                     confirmations: dataUtxo.confirmations,
@@ -122,7 +122,7 @@ exports.BlockchainDotInfo = function() {
             var result = {
                 block_height: data.block_height,
                 lock_time: data.lock_time,
-                tx_id: data.hash,
+                txid: data.hash,
                 inputs: [],
                 outputs: [],
             }

@@ -19,13 +19,13 @@ exports.Blank = function() {
     this.utxos = function(addr, handler) {
         var blankResult = [
             {
-                tx_id: "",
+                txid: "",
                 tx_output: 0,
                 amount: 0,
                 confirmations: 2,
             },
             {
-                tx_id: "",
+                txid: "",
                 tx_output: 0,
                 amount: 0,
                 confirmations: 1,
@@ -47,7 +47,7 @@ exports.Blank = function() {
             block_height: 0,
             block_time: 0,
             lock_time: 0,
-            tx_id: txid,
+            txid: txid,
             fee: 0,
             inputs: [
                 {

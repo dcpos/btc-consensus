@@ -44,7 +44,7 @@ exports.BlockrDotIo = function() {
             for (var i=0; i<data.data.unspent.length; i++) {
                 var dataUtxo = data.data.unspent[i];
                 var utxo = {
-                    tx_id: dataUtxo.tx,
+                    txid: dataUtxo.tx,
                     tx_output: dataUtxo.n,
                     amount: toSatoshis(dataUtxo.amount),
                     confirmations: dataUtxo.confirmations,
@@ -94,7 +94,7 @@ exports.BlockrDotIo = function() {
             var result = {
                 block_height: data.data.block,
                 block_time: new Date(data.data.time_utc).getTime() / 1000,
-                tx_id: data.data.tx,
+                txid: data.data.tx,
                 fee: toSatoshis(data.data.fee),
                 inputs: [],
                 outputs: [],

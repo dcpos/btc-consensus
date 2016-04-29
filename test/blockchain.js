@@ -46,7 +46,7 @@ describe('Blockchain', function() {
             b.utxos(addr, function(err, data) {
                 assert.equal(err, null);
                 assert.isAtLeast(data.length, 2);
-                assert.equal(data[0].tx_id, "");
+                assert.equal(data[0].txid, "");
                 assert.equal(data[0].amount, 0);
                 assert.equal(data[0].confirmations, 2);
                 assert.equal(data[1].confirmations, 1);
@@ -81,7 +81,7 @@ describe('Blockchain', function() {
                 assert.equal(err, null);
                 assert.equal(data.block_height, 0);
                 assert.equal(data.block_time, 0);
-                assert.equal(data.tx_id, txid);
+                assert.equal(data.txid, txid);
                 assert.equal(data.fee, 0);
                 assert.equal(data.inputs[0].address, "");
                 assert.equal(data.inputs[0].txid, "");

@@ -51,7 +51,7 @@ exports.Insight = function(root) {
             for (var i=0; i<data.length; i++) {
                 var dataUtxo = data[i];
                 var utxo = {
-                    tx_id: dataUtxo.txid,
+                    txid: dataUtxo.txid,
                     tx_output: dataUtxo.vout,
                     amount: dataUtxo.amount * 1e8,
                     confirmations: dataUtxo.confirmations,
@@ -101,7 +101,7 @@ exports.Insight = function(root) {
             var result = {
                 block_time: data.time,
                 lock_time: data.locktime,
-                tx_id: data.txid,
+                txid: data.txid,
                 fee: toSatoshis(data.fees),
                 inputs: [],
                 outputs: [],

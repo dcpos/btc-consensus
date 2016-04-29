@@ -37,7 +37,7 @@ describe('BlankSource', function() {
             var s = new source.Blank();
             var testAddr = "any bitcoin addresss";
             var keys = [
-                "tx_id",
+                "txid",
                 "tx_output",
                 "amount",
                 "confirmations",
@@ -85,7 +85,7 @@ describe('BlankSource', function() {
                 "block_height",
                 "block_time",
                 "lock_time",
-                "tx_id",
+                "txid",
                 "fee",
                 "inputs",
                 "outputs",

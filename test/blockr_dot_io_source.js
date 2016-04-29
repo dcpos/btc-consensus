@@ -77,7 +77,7 @@ describe('BlockrDotIo', function() {
                 // Contains data
                 assert.equal(data.block_height, 409351);
                 assert.equal(data.block_time, 1461898842);
-                assert.equal(data.tx_id, testTxid);
+                assert.equal(data.txid, testTxid);
                 assert.equal(data.fee, 50000);
                 // Inputs
                 assert.equal(data.inputs.length, 1);

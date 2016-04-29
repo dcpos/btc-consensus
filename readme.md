@@ -127,7 +127,7 @@ Unless specifically stated, unconfirmed transactions are included.
 ```
 [
     {
-        tx_id: "",
+        txid: "",
         tx_output: 0,
         amount: 0,
         confirmations: 0,
@@ -144,9 +144,9 @@ confirmations.
 
 ```
 [
-    "oldest_tx_id",
+    "oldest_txid",
     ...
-    "newest_tx_id"
+    "newest_txid"
 ]
 ```
 
@@ -162,7 +162,7 @@ confirmations.
     block_height: 0,
     block_time: 0,
     lock_time: 0,
-    tx_id: "",
+    txid: "",
     fee: 0,
     inputs: [
         {
