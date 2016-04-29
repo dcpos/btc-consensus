@@ -47,7 +47,7 @@ exports.Blank = function() {
             block_height: 0,
             block_time: 0,
             lock_time: 0,
-            tx_id: "",
+            tx_id: txid,
             fee: 0,
             inputs: [
                 {

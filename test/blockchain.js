@@ -70,6 +70,29 @@ describe('Blockchain', function() {
         });
     });
 
+    describe('tx', function() {
+        b = new btc.Blockchain([
+            new btc.Sources.Blank(),
+            new btc.Sources.Blank(),
+        ]);
+        it("returns an aggregated result", function() {
+            var txid = "any txid";
+            b.tx(txid, function(err, data) {
+                assert.equal(err, null);
+                assert.equal(data.block_height, 0);
+                assert.equal(data.block_time, 0);
+                assert.equal(data.tx_id, txid);
+                assert.equal(data.fee, 0);
+                assert.equal(data.inputs[0].address, "");
+                assert.equal(data.inputs[0].txid, "");
+                assert.equal(data.inputs[0].amount, 0);
+                assert.equal(data.inputs[0].tx_output, 0);
+                assert.equal(data.outputs[0].address, "");
+                assert.equal(data.outputs[0].amount, 0);
+            });
+        });
+    });
+
 });
 
 describe('Source creation', function() {

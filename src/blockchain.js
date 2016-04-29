@@ -91,6 +91,35 @@ module.exports.Blockchain = function(sources, options) {
         }
     }
 
+    this.tx = function(txid, handler) {
+        var responses = [];
+        // Get tx data from each source
+        for (var i=0; i<sources.length; i++) {
+            (function(index) {
+                var source = sources[index];
+                source.tx(txid, function(err, data) {
+                    // Handle error if it exists
+                    if (err) {
+                        responses[index] = {}; // result is in but is meaningless
+                    }
+                    else {
+                        responses[index] = data; // cache this result
+                    }
+                    // See if ready to aggregate responses
+                    for (var j=0; j<responses.length; j++) {
+                        if (typeof responses[j] == "undefined") {
+                            // Not ready to aggregate
+                            return;
+                        }
+                    }
+                    // Aggregate the responses
+                    var response = aggregate(responses);
+                    handler(null, response);
+                });
+            })(i);
+        }
+    }
+
 }
 
 // Collapse multiple responses into a single response.
