@@ -86,4 +86,51 @@ exports.Insight = function(root) {
         });
     }
 
+    this.tx = function(txid, handler) {
+        var url = root + "/api/tx/" + txid;
+        request.get({
+            url: url,
+            json: true,
+        }, function(err, response, data) {
+            if (err) {
+                handler(err);
+            }
+            if (response.statusCode != 200) {
+                handler("insight statusCode: " + response.statusCode);
+            }
+            var result = {
+                block_time: data.time,
+                lock_time: data.locktime,
+                tx_id: data.txid,
+                fee: toSatoshis(data.fees),
+                inputs: [],
+                outputs: [],
+            }
+            // inputs
+            result.inputs = data.vin.map(function(input) {
+                return {
+                    address: input.addr,
+                    txid: input.txid,
+                    amount: input.valueSat,
+                    tx_output: input.vout,
+                }
+            });
+            // outputs
+            result.outputs = data.vout.map(function(output) {
+                return {
+                    address: output.scriptPubKey.addresses[0],
+                    amount: toSatoshis(output.value),
+                }
+            });
+            handler(null, result);
+        });
+    }
+
+    function toSatoshis(btcStr) {
+        var btc = parseFloat(btcStr);
+        var satoshis = Math.round(btc * 1e8);
+        var positive = Math.abs(satoshis);
+        return positive;
+    }
+
 }
