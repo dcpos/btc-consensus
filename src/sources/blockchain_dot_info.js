@@ -14,7 +14,7 @@ exports.BlockchainDotInfo = function() {
                 handler(err);
             }
             if (response.statusCode != 200) {
-                handle("blockchain_dot_info statusCode: " + response.statusCode);
+                handler("blockchain_dot_info statusCode: " + response.statusCode);
             }
             // TODO use data.txs to calculate
             // balance_confirmed and balance_unconfirmed
@@ -39,7 +39,7 @@ exports.BlockchainDotInfo = function() {
                 handler(err);
             }
             if (response.statusCode != 200) {
-                handle("blockchain_dot_info statusCode: " + response.statusCode);
+                handler("blockchain_dot_info statusCode: " + response.statusCode);
             }
             if ("notice" in data) {
                 // eg "This wallet contains a very large number of small unspent inputs. Ignoring some."
@@ -88,7 +88,7 @@ exports.BlockchainDotInfo = function() {
                 handler(err);
             }
             if (response.statusCode != 200) {
-                handle("blockchain_dot_info statusCode: " + response.statusCode);
+                handler("blockchain_dot_info statusCode: " + response.statusCode);
             }
             // Save these tx hashes to the result
             var txHashes = data.txs.map(function(t) { return t.hash; });

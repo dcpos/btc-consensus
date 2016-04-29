@@ -12,7 +12,7 @@ exports.BlockrDotIo = function() {
                 handler(err);
             }
             if (response.statusCode != 200) {
-                handle("blockr_dot_io statusCode: " + response.statusCode);
+                handler("blockr_dot_io statusCode: " + response.statusCode);
             }
             var result = {
                 address: addr,
@@ -35,10 +35,10 @@ exports.BlockrDotIo = function() {
                 handler(err);
             }
             if (response.statusCode != 200) {
-                handle("blockr_dot_io statusCode: " + response.statusCode);
+                handler("blockr_dot_io statusCode: " + response.statusCode);
             }
             if (data.status != "success") {
-                handle("blockr_dot_io status: " + data.status);
+                handler("blockr_dot_io status: " + data.status);
             }
             var utxos = [];
             for (var i=0; i<data.data.unspent.length; i++) {
@@ -71,7 +71,7 @@ exports.BlockrDotIo = function() {
                 handler(err);
             }
             if (response.statusCode != 200) {
-                handle("blockr_dot_io statusCode: " + response.statusCode);
+                handler("blockr_dot_io statusCode: " + response.statusCode);
             }
             var txHashes = data.data.txs.map(function(t) { return t.tx; });
             var oldestFirst = txHashes.reverse();

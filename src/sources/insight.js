@@ -20,7 +20,7 @@ exports.Insight = function(root) {
                 handler(err);
             }
             if (response.statusCode != 200) {
-                handle("insight statusCode: " + response.statusCode);
+                handler("insight statusCode: " + response.statusCode);
             }
             var result = {
                 address: addr,
@@ -45,7 +45,7 @@ exports.Insight = function(root) {
                 handler(err);
             }
             if (response.statusCode != 200) {
-                handle("insight statusCode: " + response.statusCode);
+                handler("insight statusCode: " + response.statusCode);
             }
             var utxos = [];
             for (var i=0; i<data.length; i++) {
@@ -78,7 +78,7 @@ exports.Insight = function(root) {
                 handler(err);
             }
             if (response.statusCode != 200) {
-                handle("insight statusCode: " + response.statusCode);
+                handler("insight statusCode: " + response.statusCode);
             }
             var txHashes = data.txs.map(function(t) { return t.txid; });
             var oldestFirst = txHashes.reverse();
