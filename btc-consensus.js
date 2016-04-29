@@ -1,4 +1,4 @@
-!function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var n;"undefined"!=typeof window?n=window:"undefined"!=typeof global?n=global:"undefined"!=typeof self&&(n=self),n.btcConsensus=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.btcConsensus = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 // Browser Request
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -559,6 +559,64 @@ module.exports.Blockchain = function(sources, options) {
         }
     }
 
+    this.txs = function(addr, handler) {
+        var responses = [];
+        // Get tx data from each source
+        for (var i=0; i<sources.length; i++) {
+            (function(index) {
+                var source = sources[index];
+                source.txs(addr, function(err, data) {
+                    // Handle error if it exists
+                    if (err) {
+                        responses[index] = {}; // result is in but is meaningless
+                    }
+                    else {
+                        responses[index] = data; // cache this result
+                    }
+                    // See if ready to aggregate responses
+                    for (var j=0; j<responses.length; j++) {
+                        if (typeof responses[j] == "undefined") {
+                            // Not ready to aggregate
+                            return;
+                        }
+                    }
+                    // Aggregate the responses
+                    var response = aggregate(responses);
+                    handler(null, response);
+                });
+            })(i);
+        }
+    }
+
+    this.tx = function(txid, handler) {
+        var responses = [];
+        // Get tx data from each source
+        for (var i=0; i<sources.length; i++) {
+            (function(index) {
+                var source = sources[index];
+                source.tx(txid, function(err, data) {
+                    // Handle error if it exists
+                    if (err) {
+                        responses[index] = {}; // result is in but is meaningless
+                    }
+                    else {
+                        responses[index] = data; // cache this result
+                    }
+                    // See if ready to aggregate responses
+                    for (var j=0; j<responses.length; j++) {
+                        if (typeof responses[j] == "undefined") {
+                            // Not ready to aggregate
+                            return;
+                        }
+                    }
+                    // Aggregate the responses
+                    var response = aggregate(responses);
+                    handler(null, response);
+                });
+            })(i);
+        }
+    }
+
 }
 
 // Collapse multiple responses into a single response.
@@ -611,12 +669,16 @@ function aggregateArrays(responses) {
     for (var i=0; i<longestResponse.length; i++) {
         // Store this value
         var value = longestResponse[i];
-        if (!(value in deduped)) {
+        var dedupeKey = JSON.stringify(value);
+        if (!(dedupeKey in deduped)) {
             values.push(value);
-            deduped[value] = true;
+            deduped[dedupeKey] = true;
         }
         // Work out how far through processing we've gone
-        var progress = i / (longestResponse.length-1);
+        var progress = 1;
+        if (longestResponse.length != 1) {
+            progress = i / (longestResponse.length-1);
+        }
         // Store the equivalent value from every other response. This is
         // calculated by going 'equally far along' the array compared to our
         // progress along the longest response.
@@ -625,9 +687,10 @@ function aggregateArrays(responses) {
             var otherResponseProgress = progress * (otherResponse.length-1);
             var otherResponseIndex = Math.floor(otherResponseProgress);
             var value = otherResponse[otherResponseIndex];
-            if (!(value in deduped)) {
+            var dedupeKey = JSON.stringify(value);
+            if (!(dedupeKey in deduped)) {
                 values.push(value);
-                deduped[value] = true;
+                deduped[dedupeKey] = true;
             }
         }
     }
@@ -688,18 +751,51 @@ exports.Blank = function() {
     this.utxos = function(addr, handler) {
         var blankResult = [
             {
-                tx_id: "",
+                txid: "",
                 tx_output: 0,
                 amount: 0,
                 confirmations: 2,
             },
             {
-                tx_id: "",
+                txid: "",
                 tx_output: 0,
                 amount: 0,
                 confirmations: 1,
             }
         ];
+        handler(null, blankResult);
+    }
+
+    this.txs = function(addr, handler) {
+        var blankResult = [
+            "oldest_tx_hash",
+            "newest_tx_hash",
+        ];
+        handler(null, blankResult);
+    }
+
+    this.tx = function(txid, handler) {
+        var blankResult = {
+            block_height: 0,
+            block_time: 0,
+            lock_time: 0,
+            txid: txid,
+            fee: 0,
+            inputs: [
+                {
+                    address: "",
+                    txid: "",
+                    amount: 0,
+                    tx_output: 0,
+                },
+            ],
+            outputs: [
+                {
+                    address: "",
+                    amount: 0,
+                }
+            ],
+        };
         handler(null, blankResult);
     }
 
@@ -709,6 +805,8 @@ exports.Blank = function() {
 var request = require('request');
 
 exports.BlockchainDotInfo = function() {
+
+    var self = this;
 
     this.address = function(addr, handler) {
         var url = "https://blockchain.info/address/" + addr + "?format=json";
@@ -720,7 +818,7 @@ exports.BlockchainDotInfo = function() {
                 handler(err);
             }
             if (response.statusCode != 200) {
-                handle("blockchain_dot_info statusCode: " + response.statusCode);
+                handler("blockchain_dot_info statusCode: " + response.statusCode);
             }
             // TODO use data.txs to calculate
             // balance_confirmed and balance_unconfirmed
@@ -745,7 +843,7 @@ exports.BlockchainDotInfo = function() {
                 handler(err);
             }
             if (response.statusCode != 200) {
-                handle("blockchain_dot_info statusCode: " + response.statusCode);
+                handler("blockchain_dot_info statusCode: " + response.statusCode);
             }
             if ("notice" in data) {
                 // eg "This wallet contains a very large number of small unspent inputs. Ignoring some."
@@ -756,7 +854,7 @@ exports.BlockchainDotInfo = function() {
             for (var i=0; i<data.unspent_outputs.length; i++) {
                 var dataUtxo = data.unspent_outputs[i];
                 var utxo = {
-                    tx_id: dataUtxo.tx_hash,
+                    txid: dataUtxo.tx_hash,
                     tx_output: dataUtxo.tx_output_n,
                     amount: dataUtxo.value,
                     confirmations: dataUtxo.confirmations,
@@ -770,6 +868,95 @@ exports.BlockchainDotInfo = function() {
                 return a.confirmations < b.confirmations;
             });
             handler(null, utxos);
+        });
+    }
+
+    this.txs = function(addr, handler, offset, result) {
+        var maxTxCount = 1e5; // circuit-breaker
+        var txPerPage = 50;
+        var url = "https://blockchain.info/address/" + addr + "?format=json";
+        if (offset) {
+            url = url + "&offset=" + offset;
+        }
+        else {
+            offset = 0;
+        }
+        if (!result) {
+            result = [];
+        }
+        request.get({
+            url: url,
+            json: true,
+        }, function(err, response, data) {
+            if (err) {
+                handler(err);
+            }
+            if (response.statusCode != 200) {
+                handler("blockchain_dot_info statusCode: " + response.statusCode);
+            }
+            // Save these tx hashes to the result
+            var txHashes = data.txs.map(function(t) { return t.hash; });
+            var oldestFirst = txHashes.reverse();
+            result = oldestFirst.concat(result);
+            // Get more if required due to pagination
+            var hasAllTxs = result.length >= data.n_tx;
+            var belowMaxTxs = offset < maxTxCount;
+            if (!hasAllTxs && belowMaxTxs) {
+                var nextOffset = offset + txPerPage;
+                self.txs(addr, handler, nextOffset, result);
+            }
+            else {
+                handler(null, result);
+            }
+        });
+    }
+
+    this.tx = function(txid, handler) {
+        var url = "https://blockchain.info/tx/" + txid + "?format=json";
+        request.get({
+            url: url,
+            json: true,
+        }, function(err, response, data) {
+            if (err) {
+                handler(err);
+            }
+            if (response.statusCode != 200) {
+                handler("blockchain_dot_info statusCode: " + response.statusCode);
+            }
+            var result = {
+                block_height: data.block_height,
+                lock_time: data.lock_time,
+                txid: data.hash,
+                inputs: [],
+                outputs: [],
+            }
+            // inputs
+            result.inputs = data.inputs.map(function(input) {
+                return {
+                    address: input.prev_out.addr,
+                    // txid: from tx_index but needs another request
+                    amount: input.prev_out.value,
+                    tx_output: input.prev_out.n,
+                }
+            });
+            // outputs
+            result.outputs = data.out.map(function(output) {
+                return {
+                    address: output.addr,
+                    amount: output.value,
+                }
+            });
+            // fee
+            var totalIn = 0;
+            for (var i=0; i<result.inputs.length; i++) {
+                totalIn += result.inputs[i].amount;
+            }
+            var totalOut = 0;
+            for (var i=0; i<result.outputs.length; i++) {
+                totalOut += result.outputs[i].amount;
+            }
+            result.fee = totalIn - totalOut;
+            handler(null, result);
         });
     }
 
@@ -790,7 +977,7 @@ exports.BlockrDotIo = function() {
                 handler(err);
             }
             if (response.statusCode != 200) {
-                handle("blockr_dot_io statusCode: " + response.statusCode);
+                handler("blockr_dot_io statusCode: " + response.statusCode);
             }
             var result = {
                 address: addr,
@@ -813,18 +1000,18 @@ exports.BlockrDotIo = function() {
                 handler(err);
             }
             if (response.statusCode != 200) {
-                handle("blockr_dot_io statusCode: " + response.statusCode);
+                handler("blockr_dot_io statusCode: " + response.statusCode);
             }
             if (data.status != "success") {
-                handle("blockr_dot_io status: " + data.status);
+                handler("blockr_dot_io status: " + data.status);
             }
             var utxos = [];
             for (var i=0; i<data.data.unspent.length; i++) {
                 var dataUtxo = data.data.unspent[i];
                 var utxo = {
-                    tx_id: dataUtxo.tx,
+                    txid: dataUtxo.tx,
                     tx_output: dataUtxo.n,
-                    amount: parseFloat(dataUtxo.amount) * 1e8,
+                    amount: toSatoshis(dataUtxo.amount),
                     confirmations: dataUtxo.confirmations,
                 };
                 utxos.push(utxo);
@@ -837,6 +1024,71 @@ exports.BlockrDotIo = function() {
             });
             handler(null, utxos);
         });
+    }
+
+    this.txs = function(addr, handler) {
+        var url = "https://btc.blockr.io/api/v1/address/txs/" + addr;
+        request.get({
+            url: url,
+            json: true,
+        }, function(err, response, data) {
+            if (err) {
+                handler(err);
+            }
+            if (response.statusCode != 200) {
+                handler("blockr_dot_io statusCode: " + response.statusCode);
+            }
+            var txHashes = data.data.txs.map(function(t) { return t.tx; });
+            var oldestFirst = txHashes.reverse();
+            handler(null, oldestFirst);
+        });
+    }
+
+    this.tx = function(txid, handler) {
+        var url = "https://btc.blockr.io/api/v1/tx/info/" + txid;
+        request.get({
+            url: url,
+            json: true,
+        }, function(err, response, data) {
+            if (err) {
+                handler(err);
+            }
+            if (response.statusCode != 200) {
+                handler("blockr_dot_io statusCode: " + response.statusCode);
+            }
+            var result = {
+                block_height: data.data.block,
+                block_time: new Date(data.data.time_utc).getTime() / 1000,
+                txid: data.data.tx,
+                fee: toSatoshis(data.data.fee),
+                inputs: [],
+                outputs: [],
+            }
+            // inputs
+            result.inputs = data.data.vins.map(function(input) {
+                return {
+                    address: input.address,
+                    txid: input.vout_tx,
+                    amount: toSatoshis(input.amount),
+                    tx_output: input.n,
+                }
+            });
+            // outputs
+            result.outputs = data.data.vouts.map(function(output) {
+                return {
+                    address: output.address,
+                    amount: toSatoshis(output.amount),
+                }
+            });
+            handler(null, result);
+        });
+    }
+
+    function toSatoshis(btcStr) {
+        var btc = parseFloat(btcStr);
+        var satoshis = Math.round(btc * 1e8);
+        var positive = Math.abs(satoshis);
+        return positive;
     }
 
 }
@@ -864,7 +1116,7 @@ exports.Insight = function(root) {
                 handler(err);
             }
             if (response.statusCode != 200) {
-                handle("insight statusCode: " + response.statusCode);
+                handler("insight statusCode: " + response.statusCode);
             }
             var result = {
                 address: addr,
@@ -889,13 +1141,13 @@ exports.Insight = function(root) {
                 handler(err);
             }
             if (response.statusCode != 200) {
-                handle("insight statusCode: " + response.statusCode);
+                handler("insight statusCode: " + response.statusCode);
             }
             var utxos = [];
             for (var i=0; i<data.length; i++) {
                 var dataUtxo = data[i];
                 var utxo = {
-                    tx_id: dataUtxo.txid,
+                    txid: dataUtxo.txid,
                     tx_output: dataUtxo.vout,
                     amount: dataUtxo.amount * 1e8,
                     confirmations: dataUtxo.confirmations,
@@ -910,6 +1162,71 @@ exports.Insight = function(root) {
             });
             handler(null, utxos);
         });
+    }
+
+    this.txs = function(addr, handler) {
+        var url = root + "/api/txs/?address=" + addr;
+        request.get({
+            url: url,
+            json: true,
+        }, function(err, response, data) {
+            if (err) {
+                handler(err);
+            }
+            if (response.statusCode != 200) {
+                handler("insight statusCode: " + response.statusCode);
+            }
+            var txHashes = data.txs.map(function(t) { return t.txid; });
+            var oldestFirst = txHashes.reverse();
+            handler(null, oldestFirst);
+        });
+    }
+
+    this.tx = function(txid, handler) {
+        var url = root + "/api/tx/" + txid;
+        request.get({
+            url: url,
+            json: true,
+        }, function(err, response, data) {
+            if (err) {
+                handler(err);
+            }
+            if (response.statusCode != 200) {
+                handler("insight statusCode: " + response.statusCode);
+            }
+            var result = {
+                block_time: data.time,
+                lock_time: data.locktime,
+                txid: data.txid,
+                fee: toSatoshis(data.fees),
+                inputs: [],
+                outputs: [],
+            }
+            // inputs
+            result.inputs = data.vin.map(function(input) {
+                return {
+                    address: input.addr,
+                    txid: input.txid,
+                    amount: input.valueSat,
+                    tx_output: input.vout,
+                }
+            });
+            // outputs
+            result.outputs = data.vout.map(function(output) {
+                return {
+                    address: output.scriptPubKey.addresses[0],
+                    amount: toSatoshis(output.value),
+                }
+            });
+            handler(null, result);
+        });
+    }
+
+    function toSatoshis(btcStr) {
+        var btc = parseFloat(btcStr);
+        var satoshis = Math.round(btc * 1e8);
+        var positive = Math.abs(satoshis);
+        return positive;
     }
 
 }
