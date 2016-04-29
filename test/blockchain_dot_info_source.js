@@ -69,10 +69,20 @@ describe('BlockchainDotInfo', function() {
                 assert.equal(data.lock_time, 409339);
                 assert.equal(data.tx_id, testTxid);
                 assert.equal(data.fee, 50000);
+                // Inputs
                 assert.equal(data.inputs.length, 1);
+                assert.equal(data.inputs[0].address, "1NuujRCgZQ5SK3MdXzyPobiNTEAY9GfR7e");
+                assert.equal(data.inputs[0].amount, 17008201487);
+                assert.equal(data.inputs[0].tx_output, 1);
+                // Outputs
                 assert.equal(data.outputs.length, 2);
+                assert.equal(data.outputs[0].address, "1BRtJ4oem96XnMC6a4iDHmG5Dfizn5ZSuF");
+                assert.equal(data.outputs[0].amount, 16558713487);
+                assert.equal(data.outputs[1].address, "3Qtod6NVjSsK873mSA7HVGv3F1M7N22VhE");
+                assert.equal(data.outputs[1].amount, 449438000);
                 // Does not contain some data
                 assert.isFalse("block_time" in data);
+                assert.isFalse("txid" in data.inputs[0]);
                 done();
             });
         });
