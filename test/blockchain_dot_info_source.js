@@ -56,4 +56,25 @@ describe('BlockchainDotInfo', function() {
             });
         });
     });
+    describe('tx()', function () {
+        it('returns data for the txid', function(done) {
+            var s = new source.BlockchainDotInfo();
+            // Not great to have to use the internet to test...
+            var testTxid = "764ca541aa1027e4dfb68d296c3e7f94dc679b434920d193ba36e2da25363dc3";
+            s.tx(testTxid, function(err, data) {
+                // No error
+                assert.equal(err, null);
+                // Contains data
+                assert.equal(data.block_height, 409351);
+                assert.equal(data.lock_time, 409339);
+                assert.equal(data.tx_id, testTxid);
+                assert.equal(data.fee, 50000);
+                assert.equal(data.inputs.length, 1);
+                assert.equal(data.outputs.length, 2);
+                // Does not contain some data
+                assert.isFalse("block_time" in data);
+                done();
+            });
+        });
+    });
 });
